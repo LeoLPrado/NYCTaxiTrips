@@ -2,9 +2,11 @@
 from pyspark.sql.functions import col, unix_timestamp, round, date_format, year, month, dayofmonth, when
 
 # Lendo a tabela bronze
-df = spark.read.table("workspace.nyctaxi_db.df_bronze")
+df = spark.read.table("workspace.bronze.nyctaxitrips")
 
 # COMMAND ----------
+
+# Renomeando as tabelas e dropando outras
 
 df = (
     df
@@ -28,12 +30,16 @@ df = df.drop(
 
 # COMMAND ----------
 
+# Calculando o tempo de viagem
+
 df = df.withColumn(
     "trip_duration_minutes",
     round((((unix_timestamp(col("dropoff_datetime")) - unix_timestamp(col("pickup_datetime"))) / 60)),2)
 )
 
 # COMMAND ----------
+
+# Formatando as datas
 
 df = df.withColumn(
     "pickup_datetime",
@@ -46,6 +52,8 @@ df = df.withColumn(
 )
 
 # COMMAND ----------
+
+# Calculando o ano, mês e dia
 
 df = df.withColumn(
     "pickup_year",
@@ -64,9 +72,7 @@ df = df.withColumn(
 
 # COMMAND ----------
 
-df.select("payment_type").distinct().show()
-
-# COMMAND ----------
+# Calculando o tipo de pagamento
 
 df = (
     df.withColumn("payment_type", when(df.payment_type == 1, "credit_card")
@@ -78,9 +84,9 @@ df = (
 
 # COMMAND ----------
 
+# Salvando o dataframe limpo na camada silver
 
-df.printSchema()
+path = "workspace.silver"
+table_name = "nyctaxi_cleaned"
 
-# COMMAND ----------
-
-df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("nyctaxi_db.df_silver")
+df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(f"{path}.{table_name}")

@@ -1,6 +1,6 @@
 # Databricks notebook source
-spark.sql(
-    """
-    CREATE DATABASE IF NOT EXISTS nyctaxi_db
-    """
-)
+# Criando as camadas da Arquitetura Medalhao
+
+spark.sql("CREATE DATABASE IF NOT EXISTS bronze")
+spark.sql("CREATE DATABASE IF NOT EXISTS silver")
+spark.sql("CREATE DATABASE IF NOT EXISTS gold")

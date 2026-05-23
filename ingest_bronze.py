@@ -1,5 +1,7 @@
 # Databricks notebook source
-df_temp = (
+# Lendo o dataset do databricks dos dados das viagens de taxis em NY no mes de dezembro de 2019
+
+df = (
     spark.read.format("csv")
     .option("header", "true")
     .option("inferSchema", "true")
@@ -8,9 +10,8 @@ df_temp = (
 
 # COMMAND ----------
 
-display(df_temp)
+# Salvando o dataset como uma tabela delta na camada bronze
 
-# COMMAND ----------
-
-df = df_temp
-df.write.format("delta").mode("overwrite").saveAsTable("nyctaxi_db.df_bronze")
+path = "workspace.bronze"
+table_name = "nyctaxitrips"
+df.write.format("delta").mode("overwrite").saveAsTable(f"{path}.{table_name}")
