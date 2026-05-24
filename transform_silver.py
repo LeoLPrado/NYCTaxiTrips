@@ -1,5 +1,5 @@
 # Databricks notebook source
-from pyspark.sql.functions import col, unix_timestamp, round, date_format, year, month, dayofmonth, when
+from pyspark.sql.functions import col, unix_timestamp, round, date_format, year, month, dayofmonth, hour, when
 
 # Lendo a tabela bronze
 df = spark.read.table("workspace.bronze.nyctaxitrips")
@@ -53,7 +53,7 @@ df = df.withColumn(
 
 # COMMAND ----------
 
-# Calculando o ano, mês e dia
+# Calculando o ano, mês e dia e a hora
 
 df = df.withColumn(
     "pickup_year",
@@ -70,6 +70,11 @@ df = df.withColumn(
     dayofmonth(col("pickup_datetime"))
 )
 
+df = df.withColumn(
+    "pickup_hour",
+    hour(col("pickup_datetime"))
+)
+
 # COMMAND ----------
 
 # Calculando o tipo de pagamento
@@ -81,6 +86,10 @@ df = (
     .when(df.payment_type == 4, "dispute")
     .otherwise("unknown"))
 )
+
+# COMMAND ----------
+
+df = df.filter(col("pickup_year") != 2008)
 
 # COMMAND ----------
 

@@ -1,0 +1,37 @@
+resources:
+  jobs:
+    NYCTaxiTrips:
+      name: NYCTaxiTrips
+      tasks:
+        - task_key: setup_0
+          notebook_task:
+            notebook_path: /Repos/leoloprado355@gmail.com/NYCTaxiTrips/setup
+            source: WORKSPACE
+          environment_key: Default
+        - task_key: ingest_bronze_1
+          depends_on:
+            - task_key: setup_0
+          notebook_task:
+            notebook_path: /Repos/leoloprado355@gmail.com/NYCTaxiTrips/ingest_bronze
+            source: WORKSPACE
+          environment_key: Default
+        - task_key: transform_silver_2
+          depends_on:
+            - task_key: ingest_bronze_1
+          notebook_task:
+            notebook_path: /Repos/leoloprado355@gmail.com/NYCTaxiTrips/transform_silver
+            source: WORKSPACE
+          environment_key: Default
+        - task_key: goldKPIs_3
+          depends_on:
+            - task_key: transform_silver_2
+          notebook_task:
+            notebook_path: /Repos/leoloprado355@gmail.com/NYCTaxiTrips/goldKPI
+            source: WORKSPACE
+      queue:
+        enabled: true
+      environments:
+        - environment_key: Default
+          spec:
+            environment_version: "5"
+      performance_target: PERFORMANCE_OPTIMIZED
